@@ -255,6 +255,28 @@ The UI supports the following configuration options for API connectivity:
 
 ## Troubleshooting
 
+### Firewall Issues with UFW
+
+If you're using UFW (Uncomplicated Firewall) on the host running NetVisor, you may need to allow traffic between the Docker containers and the daemon. The daemon uses host networking and listens on port 60073, while the server container runs on a custom bridge network.
+
+**Add UFW rules to allow server-to-daemon communication:**
+
+```bash
+# Allow traffic from the Docker bridge network to the daemon port
+sudo ufw allow from 172.31.0.0/16 to any port 60073 proto tcp
+
+# Or be more specific and allow only from the gateway
+sudo ufw allow from 172.31.0.1 to any port 60073 proto tcp
+```
+
+**Check your Docker bridge network:**
+```bash
+# Verify your network subnet
+docker network inspect netvisor_netvisor
+```
+
+The subnet should match the `172.31.0.0/16` range configured in docker-compose.yml. Adjust the UFW rule if your network uses a different subnet.
+
 ### Error: CONCURRENT_SCANS is too high for this system
 
 The CONCURRENT_SCANS env var controls concurrent network scan operations. If too high, the system running the daemon will run out of memory.
@@ -273,7 +295,7 @@ If the integrated daemon (included in docker-compose.yml) fails to initialize af
 
 1. **Check daemon logs**: `docker logs netvisor-daemon`
 2. **Check server logs**: `docker logs netvisor-server`
-3. **Verify server can reach daemon**: Ensure the daemon's `NETVISOR_INTEGRATED_DAEMON_URL` environment variable is correctly set in the server service. For most setups, the default configuration ( `http://172.17.0.1:60073`) should work. If you're using a custom Docker network, or running in an environment like an LXC, you may need to adjust the gateway IP.
+3. **Verify server can reach daemon**: Ensure the daemon's `NETVISOR_INTEGRATED_DAEMON_URL` environment variable is correctly set in the server service. For most setups, the default configuration ( `http://172.31.0.1:60073`) should work. If you're using a custom Docker network, or running in an environment like an LXC, you may need to adjust the gateway IP.
 4. **Verify server is accessible**: The daemon must be able to reach the server. If using the default docker-compose, this should work automatically.
 
 ## Uninstall Daemon

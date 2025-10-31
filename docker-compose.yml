@@ -52,8 +52,8 @@ services:
       <<: *netvisor-env
       NETVISOR_DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-password}@postgres:5432/netvisor
       NETVISOR_WEB_EXTERNAL_PATH: /app/static
-      # 172.17.0.1 is Docker's default bridge gateway. If your's is different, make sure to change it.
-      NETVISOR_INTEGRATED_DAEMON_URL: http://172.17.0.1:${NETVISOR_DAEMON_PORT:-60073}
+      # 172.31.0.1 is the gateway for the netvisor bridge network. If your's is different, make sure to change it.
+      NETVISOR_INTEGRATED_DAEMON_URL: http://172.31.0.1:${NETVISOR_DAEMON_PORT:-60073}
     volumes:
       - ./data:/data
     depends_on:

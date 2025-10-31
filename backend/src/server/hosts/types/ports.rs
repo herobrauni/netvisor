@@ -53,6 +53,7 @@ impl PartialEq for Port {
 #[strum_discriminants(derive(Display, Hash, EnumIter))]
 pub enum PortBase {
     Ssh,
+    SshAlt,
     Telnet,
     DnsUdp,
     DnsTcp,
@@ -201,6 +202,10 @@ impl PortBase {
                 number: 22,
                 protocol: TransportProtocol::Tcp,
             },
+            PortBase::SshAlt => PortConfig {
+                number: 666,
+                protocol: TransportProtocol::Tcp,
+            },
             PortBase::Telnet => PortConfig {
                 number: 23,
                 protocol: TransportProtocol::Tcp,
@@ -297,6 +302,7 @@ impl TypeMetadataProvider for PortBase {
     fn name(&self) -> &'static str {
         match self {
             PortBase::Ssh => "SSH",
+            PortBase::SshAlt => "SSH Alt",
             PortBase::Telnet => "Telnet",
             PortBase::DnsUdp => "DNS (UDP)",
             PortBase::DnsTcp => "DNS (TCP)",
@@ -321,6 +327,7 @@ impl TypeMetadataProvider for PortBase {
     fn description(&self) -> &'static str {
         match self {
             PortBase::Ssh => "Secure Shell",
+            PortBase::SshAlt => "Alternative SSH Port",
             PortBase::Telnet => "Telnet Protocol",
             PortBase::DnsUdp => "Domain Name System (UDP)",
             PortBase::DnsTcp => "Domain Name System (TCP)",
@@ -346,6 +353,7 @@ impl TypeMetadataProvider for PortBase {
         let is_management = matches!(
             self,
             PortBase::Ssh
+                | PortBase::SshAlt
                 | PortBase::Telnet
                 | PortBase::Rdp
                 | PortBase::Snmp

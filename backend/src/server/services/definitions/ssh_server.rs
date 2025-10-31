@@ -20,8 +20,8 @@ impl ServiceDefinition for SshServer {
 
     fn discovery_pattern(&self) -> Pattern<'_> {
         Pattern::AnyOf(vec![
-            Pattern::Port(PortBase::Ssh),     // Port 22
-            Pattern::Port(PortBase::SshAlt),  // Port 666
+            Pattern::Port(PortBase::Ssh),    // Port 22
+            Pattern::Port(PortBase::SshAlt), // Port 666
         ])
     }
 

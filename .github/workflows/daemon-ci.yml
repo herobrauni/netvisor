@@ -18,6 +18,11 @@ on:
       - 'backend/*'
       - '.github/workflows/daemon-ci.yml'
 
+# Concurrency group for PRs to cancel previous runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 defaults:
   run:
     working-directory: ./backend

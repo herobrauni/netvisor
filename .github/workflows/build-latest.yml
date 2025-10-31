@@ -1,0 +1,67 @@
+name: Build Latest Images
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'ui/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/build-latest.yml'
+
+# Concurrency group to ensure only one build runs at a time
+concurrency:
+  group: build-latest
+  cancel-in-progress: true
+
+jobs:
+  build-docker:
+    name: Build and Push Latest Docker Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get short commit SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build and push Server+UI image
+        uses: docker/build-push-action@v5
+        with:
+          context: .  # Build from project root to access both backend/ and ui/
+          file: ./backend/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            PUBLIC_SERVER_HOSTNAME=default
+            PUBLIC_SERVER_PORT=60072
+          tags: |
+            ghcr.io/${{ github.repository }}/server:latest
+            ghcr.io/${{ github.repository }}/server:${{ steps.vars.outputs.sha_short }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Daemon image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile.daemon
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/daemon:latest
+            ghcr.io/${{ github.repository }}/daemon:${{ steps.vars.outputs.sha_short }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

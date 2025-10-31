@@ -104,6 +104,7 @@ pub mod qnap;
 pub mod restic;
 pub mod ring_doorbell;
 pub mod roku;
+pub mod ssh_server;
 pub mod sonos_speaker;
 pub mod switch;
 pub mod syncthing;

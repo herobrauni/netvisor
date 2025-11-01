@@ -1,11 +1,11 @@
 use crate::daemon::discovery::service::base::Discovery;
 use crate::daemon::discovery::service::network::NetworkScanDiscovery;
 use crate::daemon::discovery::service::ping::PingScanDiscovery;
-use crate::server::discovery::types::base::DiscoveryType;
 use crate::daemon::runtime::types::DaemonAppState;
 use crate::server::daemons::types::api::{
     DaemonDiscoveryCancellationRequest, DaemonDiscoveryCancellationResponse,
 };
+use crate::server::discovery::types::base::DiscoveryType;
 use crate::server::{
     daemons::types::api::{DaemonDiscoveryRequest, DaemonDiscoveryResponse},
     shared::types::api::{ApiError, ApiResponse, ApiResult},
@@ -24,7 +24,11 @@ async fn handle_discovery_request(
     Json(request): Json<DaemonDiscoveryRequest>,
 ) -> ApiResult<Json<ApiResponse<DaemonDiscoveryResponse>>> {
     let session_id = request.session_id;
-    tracing::info!("Received discovery request for session {} with type {}", session_id, request.discovery_type);
+    tracing::info!(
+        "Received discovery request for session {} with type {}",
+        session_id,
+        request.discovery_type
+    );
 
     match request.discovery_type {
         DiscoveryType::Network => {
@@ -44,9 +48,10 @@ async fn handle_discovery_request(
             discovery.discover_on_network(request).await?;
         }
         _ => {
-            return Err(ApiError::bad_request(
-                &format!("Discovery type {:?} not supported in daemon", request.discovery_type),
-            ));
+            return Err(ApiError::bad_request(&format!(
+                "Discovery type {:?} not supported in daemon",
+                request.discovery_type
+            )));
         }
     };
 

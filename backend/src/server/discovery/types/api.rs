@@ -1,6 +1,6 @@
+use crate::server::discovery::types::base::DiscoveryType;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use crate::server::discovery::types::base::DiscoveryType;
 
 // Request from frontend to server
 #[derive(Debug, Serialize, Clone, Deserialize)]

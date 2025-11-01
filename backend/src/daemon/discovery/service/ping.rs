@@ -176,8 +176,11 @@ impl Discovery<PingScanDiscovery> {
                                     )
                                     .await
                                 {
-                                    discovered_count.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-                                    if let Ok((created_host, _)) = self.create_host(host, services).await {
+                                    discovered_count
+                                        .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                                    if let Ok((created_host, _)) =
+                                        self.create_host(host, services).await
+                                    {
                                         return Ok::<Option<Host>, Error>(Some(created_host));
                                     }
                                 }
@@ -256,9 +259,9 @@ impl Discovery<PingScanDiscovery> {
         };
 
         // Use a blocking task for the ping operation since pnet is sync
-        let ping_result = tokio::task::spawn_blocking(move || {
-            Self::ping_host_sync(ipv4_addr)
-        }).await.map_err(|e| anyhow!("Ping task panicked: {}", e))?;
+        let ping_result = tokio::task::spawn_blocking(move || Self::ping_host_sync(ipv4_addr))
+            .await
+            .map_err(|e| anyhow!("Ping task panicked: {}", e))?;
 
         match ping_result {
             Ok(true) => {

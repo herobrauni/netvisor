@@ -38,7 +38,8 @@
 		}
 
 		// Basic IP validation
-		const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+		const ipRegex =
+			/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 		if (!ipRegex.test(ipInput)) {
 			pushError('Please enter a valid IP address');
 			return;
@@ -50,7 +51,7 @@
 				pushSuccess(`Daemon IP updated to ${ipInput}:${port}`);
 				handleOnClose();
 			}
-		} catch (error) {
+		} catch {
 			pushError('Failed to update daemon IP');
 		}
 	}
@@ -73,9 +74,7 @@
 	</svelte:fragment>
 
 	<div class="space-y-4">
-		<h3 class="text-primary text-lg font-medium">
-			Update IP Address and Port
-		</h3>
+		<h3 class="text-primary text-lg font-medium">Update IP Address and Port</h3>
 
 		{#if daemon}
 			<div class="text-secondary mb-4">
@@ -84,7 +83,7 @@
 
 			<div class="space-y-4">
 				<div>
-					<label for="ip-input" class="block text-sm font-medium text-gray-700 mb-1">
+					<label for="ip-input" class="mb-1 block text-sm font-medium text-gray-700">
 						IP Address
 					</label>
 					<input
@@ -92,12 +91,12 @@
 						type="text"
 						bind:value={ipInput}
 						placeholder="192.168.1.100"
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+						class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
 
 				<div>
-					<label for="port-input" class="block text-sm font-medium text-gray-700 mb-1">
+					<label for="port-input" class="mb-1 block text-sm font-medium text-gray-700">
 						Port
 					</label>
 					<input
@@ -107,14 +106,15 @@
 						placeholder="60073"
 						min="1"
 						max="65535"
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+						class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
 			</div>
 
-			<div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+			<div class="mt-4 rounded-md border border-yellow-200 bg-yellow-50 p-3">
 				<p class="text-sm text-yellow-800">
-					<strong>Note:</strong> After updating the IP, make sure the daemon is running at the new address and port.
+					<strong>Note:</strong> After updating the IP, make sure the daemon is running at the new address
+					and port.
 				</p>
 			</div>
 		{:else}

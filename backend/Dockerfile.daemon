@@ -13,7 +13,7 @@ COPY . .
 # Build daemon binary in release mode
 RUN cargo build --release --bin daemon
 
-FROM debian:bookworm-slim AS runtime
+FROM debian:trixie-slim AS runtime
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     curl \

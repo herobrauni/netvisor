@@ -4,7 +4,7 @@ use crate::server::{
         api::{DaemonDiscoveryRequest, DiscoveryUpdatePayload},
         base::Daemon,
     },
-    discovery::types::{api::InitiateDiscoveryRequest, base::DiscoveryType},
+    discovery::types::api::InitiateDiscoveryRequest,
     shared::types::api::{ApiError, ApiResponse, ApiResult},
 };
 use axum::{
@@ -45,7 +45,21 @@ async fn daemon_initiate_discovery(
     State(state): State<Arc<AppState>>,
     Json(request): Json<InitiateDiscoveryRequest>,
 ) -> ApiResult<Json<ApiResponse<Uuid>>> {
+    let discovery_type = request.discovery_type;
     let (daemon, session_id) = initiate_discovery(state.clone(), request).await?;
+
+    // Send discovery request to daemon (self)
+    state
+        .services
+        .daemon_service
+        .send_discovery_request(
+            &daemon,
+            DaemonDiscoveryRequest {
+                discovery_type,
+                session_id,
+            },
+        )
+        .await?;
 
     // Create discovery session
     state
@@ -64,6 +78,8 @@ async fn user_initiate_discovery(
     State(state): State<Arc<AppState>>,
     Json(request): Json<InitiateDiscoveryRequest>,
 ) -> ApiResult<Json<ApiResponse<DiscoveryUpdatePayload>>> {
+    let discovery_type = request.discovery_type;
+    let daemon_id = request.daemon_id;
     let (daemon, session_id) = initiate_discovery(state.clone(), request).await?;
 
     // Send discovery request to daemon
@@ -73,7 +89,7 @@ async fn user_initiate_discovery(
         .send_discovery_request(
             &daemon,
             DaemonDiscoveryRequest {
-                discovery_type: DiscoveryType::Network,
+                discovery_type,
                 session_id,
             },
         )
@@ -82,7 +98,7 @@ async fn user_initiate_discovery(
     // Create discovery session
     let update = state
         .discovery_manager
-        .create_session(session_id, request.daemon_id)
+        .create_session(session_id, daemon_id)
         .await
         .map_err(|e| {
             ApiError::internal_error(&format!("Failed to create discovery session: {}", e))

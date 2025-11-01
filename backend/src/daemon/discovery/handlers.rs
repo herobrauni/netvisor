@@ -1,5 +1,7 @@
 use crate::daemon::discovery::service::base::Discovery;
 use crate::daemon::discovery::service::network::NetworkScanDiscovery;
+use crate::daemon::discovery::service::ping::PingScanDiscovery;
+use crate::server::discovery::types::base::DiscoveryType;
 use crate::daemon::runtime::types::DaemonAppState;
 use crate::server::daemons::types::api::{
     DaemonDiscoveryCancellationRequest, DaemonDiscoveryCancellationResponse,
@@ -22,15 +24,31 @@ async fn handle_discovery_request(
     Json(request): Json<DaemonDiscoveryRequest>,
 ) -> ApiResult<Json<ApiResponse<DaemonDiscoveryResponse>>> {
     let session_id = request.session_id;
-    tracing::info!("Received discovery request for session {}", session_id);
+    tracing::info!("Received discovery request for session {} with type {}", session_id, request.discovery_type);
 
-    let discovery = Arc::new(Discovery::new(
-        state.services.discovery_service.clone(),
-        state.services.discovery_manager.clone(),
-        NetworkScanDiscovery::default(),
-    ));
-
-    discovery.discover_on_network(request).await?;
+    match request.discovery_type {
+        DiscoveryType::Network => {
+            let discovery = Arc::new(Discovery::new(
+                state.services.discovery_service.clone(),
+                state.services.discovery_manager.clone(),
+                NetworkScanDiscovery::default(),
+            ));
+            discovery.discover_on_network(request).await?;
+        }
+        DiscoveryType::Ping => {
+            let discovery = Arc::new(Discovery::new(
+                state.services.discovery_service.clone(),
+                state.services.discovery_manager.clone(),
+                PingScanDiscovery::default(),
+            ));
+            discovery.discover_on_network(request).await?;
+        }
+        _ => {
+            return Err(ApiError::bad_request(
+                &format!("Discovery type {:?} not supported in daemon", request.discovery_type),
+            ));
+        }
+    };
 
     Ok(Json(ApiResponse::success(DaemonDiscoveryResponse {
         session_id,

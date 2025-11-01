@@ -57,6 +57,7 @@ impl Default for DiscoveryMetadata {
 pub enum DiscoveryType {
     SelfReport,
     Network,
+    Ping,
     Docker { host_id: Uuid },
     Proxmox { host_id: Uuid },
 }

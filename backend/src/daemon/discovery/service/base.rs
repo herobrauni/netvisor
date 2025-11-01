@@ -958,7 +958,10 @@ pub trait InitiatesOwnDiscovery:
             .client
             .post(format!("{}/api/discovery/daemon-initiate", server_target))
             .header("Authorization", format!("Bearer {}", api_key))
-            .json(&InitiateDiscoveryRequest { daemon_id })
+            .json(&InitiateDiscoveryRequest {
+                daemon_id,
+                discovery_type: DiscoveryType::Network,
+            })
             .send()
             .await?;
 

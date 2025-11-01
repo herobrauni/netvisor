@@ -8,12 +8,13 @@
 	import { networks } from '$lib/features/networks/store';
 	import { formatTimestamp } from '$lib/shared/utils/formatting';
 	import { getHostFromId } from '$lib/features/hosts/store';
-	import { RotateCcwKey, Trash2 } from 'lucide-svelte';
+	import { RotateCcwKey, Trash2, Edit } from 'lucide-svelte';
 
 	export let daemon: Daemon;
 	export let onDelete: (daemon: Daemon) => void = () => {};
 	export let onDiscovery: (daemon: Daemon) => void = () => {};
 	export let onGenerateApi: (daemon: Daemon) => void = () => {};
+	export let onUpdateIp: (daemon: Daemon) => void = () => {};
 	export let discoveryIsRunning: boolean;
 	export let viewMode: 'card' | 'list';
 
@@ -68,6 +69,13 @@
 						}
 					]
 				: []),
+			{
+				label: 'Update IP',
+				icon: Edit,
+				class: 'btn-icon',
+				onClick: () => onUpdateIp(daemon),
+				disabled: daemonIsRunningDiscovery
+			},
 			{
 				label: 'Update API Key',
 				icon: RotateCcwKey,

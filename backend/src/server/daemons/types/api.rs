@@ -58,6 +58,13 @@ pub struct DaemonDiscoveryCancellationResponse {
     pub session_id: Uuid,
 }
 
+/// Update daemon IP request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateDaemonIpRequest {
+    pub ip: IpAddr,
+    pub port: u16,
+}
+
 /// Progress update from daemon to server during discovery
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiscoveryUpdatePayload {

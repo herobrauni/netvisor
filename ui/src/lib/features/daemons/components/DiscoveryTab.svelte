@@ -9,6 +9,7 @@
 	import { getNetworks, networks } from '$lib/features/networks/store';
 	import DaemonCard from './DaemonCard.svelte';
 	import CreateDaemonModal from './CreateDaemonModal.svelte';
+	import UpdateIpModal from './UpdateIpModal.svelte';
 	import { getHosts } from '$lib/features/hosts/store';
 	import type { FieldConfig } from '$lib/shared/components/data/types';
 	import DataControls from '$lib/shared/components/data/DataControls.svelte';
@@ -16,6 +17,7 @@
 	const loading = loadData([getNetworks, getDaemons, getHosts]);
 
 	let showCreateDaemonModal = false;
+	let showUpdateIpModal = false;
 	let daemon: Daemon | null = null;
 
 	$: discoveryIsRunning = $sessions.size > 0;
@@ -43,6 +45,16 @@
 	function handleGenerateApiKey(generateApiDaemon: Daemon) {
 		showCreateDaemonModal = true;
 		daemon = generateApiDaemon;
+	}
+
+	function handleUpdateIp(updateIpDaemon: Daemon) {
+		showUpdateIpModal = true;
+		daemon = updateIpDaemon;
+	}
+
+	function handleCloseUpdateIp() {
+		showUpdateIpModal = false;
+		daemon = null;
 	}
 
 	// Define field configuration for the DataTableControls
@@ -103,6 +115,7 @@
 					onDiscovery={handleRunDiscovery}
 					onDelete={handleDeleteDaemon}
 					onGenerateApi={handleGenerateApiKey}
+					onUpdateIp={handleUpdateIp}
 				/>
 			{/snippet}
 		</DataControls>
@@ -110,3 +123,4 @@
 </div>
 
 <CreateDaemonModal isOpen={showCreateDaemonModal} onClose={handleCloseCreateDaemon} {daemon} />
+<UpdateIpModal isOpen={showUpdateIpModal} onClose={handleCloseUpdateIp} {daemon} />

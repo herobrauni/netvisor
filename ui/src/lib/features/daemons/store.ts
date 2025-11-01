@@ -35,6 +35,16 @@ export async function createNewApiKey(data: ApiKeyRequest) {
 	}
 }
 
+export async function updateDaemonIp(id: string, ip: string, port: number) {
+	return await api.request<Daemon, Daemon[]>(
+		`/daemons/${id}/update_ip`,
+		daemons,
+		(updatedDaemon, current) =>
+			current.map((d) => (d.id === updatedDaemon.id ? updatedDaemon : d)),
+		{ method: 'PUT', body: JSON.stringify({ ip, port }) }
+	);
+}
+
 export async function deleteDaemon(id: string) {
 	return await api.request<void, Daemon[]>(
 		`/daemons/${id}`,

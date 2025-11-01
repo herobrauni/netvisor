@@ -2,7 +2,10 @@ use crate::server::{
     auth::middleware::{AuthenticatedDaemon, AuthenticatedUser},
     config::AppState,
     daemons::types::{
-        api::{ApiKeyRequest, DaemonRegistrationRequest, DaemonRegistrationResponse},
+        api::{
+            ApiKeyRequest, DaemonRegistrationRequest, DaemonRegistrationResponse,
+            UpdateDaemonIpRequest,
+        },
         base::{Daemon, DaemonBase},
     },
     hosts::types::base::{Host, HostBase},
@@ -24,6 +27,7 @@ pub fn create_router() -> Router<Arc<AppState>> {
         .route("/register", post(register_daemon))
         .route("/create_new_api_key", post(create_new_api_key))
         .route("/{id}/update_api_key", post(update_api_key))
+        .route("/{id}/update_ip", put(update_daemon_ip))
         .route("/{id}/heartbeat", put(receive_heartbeat))
         .route("/{id}", get(get_daemon))
         .route("/{id}", delete(delete_daemon))
@@ -171,6 +175,32 @@ async fn get_daemon(
         .ok_or_else(|| ApiError::not_found(format!("Daemon '{}' not found", &id)))?;
 
     Ok(Json(ApiResponse::success(daemon)))
+}
+
+async fn update_daemon_ip(
+    State(state): State<Arc<AppState>>,
+    _user: AuthenticatedUser,
+    Path(id): Path<Uuid>,
+    Json(request): Json<UpdateDaemonIpRequest>,
+) -> ApiResult<Json<ApiResponse<Daemon>>> {
+    let service = &state.services.daemon_service;
+
+    let mut daemon = service
+        .get_daemon(&id)
+        .await
+        .map_err(|e| ApiError::internal_error(&format!("Failed to get daemon: {}", e)))?
+        .ok_or_else(|| ApiError::not_found(format!("Daemon '{}' not found", &id)))?;
+
+    // Update the daemon's IP and port
+    daemon.base.ip = request.ip;
+    daemon.base.port = request.port;
+
+    let updated_daemon = service
+        .update_daemon(daemon)
+        .await
+        .map_err(|e| ApiError::internal_error(&format!("Failed to update daemon: {}", e)))?;
+
+    Ok(Json(ApiResponse::success(updated_daemon)))
 }
 
 async fn delete_daemon(

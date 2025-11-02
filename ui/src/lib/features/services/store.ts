@@ -22,6 +22,27 @@ export async function getServices() {
 	);
 }
 
+// Delete a service
+export async function deleteService(id: string) {
+	return await api.request<void, Service[]>(
+		`/services/${id}`,
+		services,
+		(_, current) => current.filter((g) => g.id !== id),
+		{ method: 'DELETE' }
+	);
+}
+
+// Update a service
+export async function updateService(data: Service) {
+	console.log(1);
+	return await api.request<Service, Service[]>(
+		`/services/${data.id}`,
+		services,
+		(updatedService, current) => current.map((s) => (s.id === data.id ? updatedService : s)),
+		{ method: 'PUT', body: JSON.stringify(data) }
+	);
+}
+
 // Helper functions for working with services and the MetadataRegistry
 export function createDefaultService(
 	serviceType: string,
@@ -133,7 +154,7 @@ export function getServicesForGroup(group_id: string): Readable<Service[]> {
 		const group = $groups.find((g) => g.id == group_id);
 
 		if (group) {
-			if (group.group_type === 'RequestPath') {
+			if (group.group_type === 'RequestPath' || group.group_type === 'HubAndSpoke') {
 				const serviceMap = new Map($services.flatMap((s) => s.bindings.map((b) => [b.id, s])));
 				return group.service_bindings
 					.map((sb) => serviceMap.get(sb))

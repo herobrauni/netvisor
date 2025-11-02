@@ -38,7 +38,7 @@
 			: {}),
 		iconColor: entities.getColorHelper('Daemon').icon,
 		icon: entities.getIconComponent('Daemon'),
-		sections: [
+		fields: [
 			{
 				label: 'Network',
 				value: $networks.find((n) => n.id == daemon.network_id)?.name || 'Unknown Network'
@@ -56,7 +56,6 @@
 				value: formatTimestamp(daemon.last_seen)
 			}
 		],
-		lists: [],
 		actions: [
 			...(daemon.api_key
 				? [

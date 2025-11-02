@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { form as createForm } from 'svelte-forms';
 	import GenericModal from '../layout/GenericModal.svelte';
-	import type { FieldType, FormApi } from './types';
+	import type { TextFieldType, FormApi, NumberFieldType } from './types';
+	import { pushWarning } from '$lib/shared/stores/feedback';
 
 	export let title: string = 'Edit';
 	export let isOpen: boolean = false;
@@ -20,13 +21,13 @@
 	export let onDelete: (() => void) | null = null;
 
 	// Create a container for fields that child components will populate
-	let formFields: Record<string, FieldType> = {};
+	let formFields: Record<string, TextFieldType | NumberFieldType> = {};
 
 	// Create the actual form reactively based on registered fields
 	$: form = createForm(...Object.values(formFields));
 
 	const formApi: FormApi = {
-		registerField: (id: string, field: FieldType) => {
+		registerField: (id: string, field: TextFieldType | NumberFieldType) => {
 			if (!Object.prototype.hasOwnProperty.call(formFields, id)) {
 				formFields = { ...formFields, [id]: field };
 			}
@@ -44,10 +45,9 @@
 		// Force validation on all fields
 		await Promise.all(Object.values(formFields).map((field) => field.validate()));
 
-		console.log($form);
-
 		// Check if current fields are valid
 		if (!$form.valid) {
+			pushWarning('Form invalid: ' + $form.errors);
 			return; // Don't proceed if validation fails
 		} else {
 			onSave?.();

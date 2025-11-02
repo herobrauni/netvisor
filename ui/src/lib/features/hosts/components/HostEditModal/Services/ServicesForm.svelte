@@ -86,6 +86,7 @@
 				allowReorder={true}
 				options={availableServiceTypes}
 				showSearch={true}
+				{formApi}
 				{items}
 				allowItemRemove={() => true}
 				optionDisplayComponent={ServiceTypeDisplay}
@@ -103,7 +104,7 @@
 			{#if selectedItem}
 				<ServiceConfigPanel
 					{formApi}
-					bind:formData
+					bind:host={formData}
 					service={selectedItem}
 					onChange={(updatedService) => onChange(updatedService)}
 				/>

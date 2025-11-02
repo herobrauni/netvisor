@@ -2,10 +2,9 @@
 	import { ALL_INTERFACES, type Port } from '$lib/features/hosts/types/base';
 	import type { EntityDisplayComponent } from '../types';
 	import { entities, ports } from '$lib/shared/stores/metadata';
-	import PortInlineEditor from './PortInlineEditor.svelte';
 	import type { Service } from '$lib/features/services/types/base';
 
-	export const PortDisplay: EntityDisplayComponent<Port> = {
+	export const PortDisplay: EntityDisplayComponent<Port, object> = {
 		getId: (port: Port) => `${port.id}`,
 		getLabel: (port: Port) => {
 			let metadata = ports.getMetadata(port.type);
@@ -50,14 +49,7 @@
 		getIconColor: () => entities.getColorHelper('Port').icon,
 		getTags: () => [],
 		getIsDisabled: () => false,
-		getCategory: () => null,
-		supportsInlineEdit: true,
-		renderInlineEdit: (port: Port, onUpdate: (updates: Partial<Port>) => void) => {
-			return {
-				component: PortInlineEditor,
-				props: { port, onUpdate }
-			};
-		}
+		getCategory: () => null
 	};
 </script>
 
@@ -67,6 +59,7 @@
 	import { get } from 'svelte/store';
 
 	export let item: Port;
+	export let context = {};
 </script>
 
-<ListSelectItem {item} displayComponent={PortDisplay} />
+<ListSelectItem {item} {context} displayComponent={PortDisplay} />

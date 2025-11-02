@@ -29,7 +29,10 @@
 	}
 
 	function handleRunDiscovery(daemon: Daemon) {
-		initiateDiscovery({ daemon_id: daemon.id });
+		initiateDiscovery({
+			daemon_id: daemon.id,
+			discovery_type: { type: 'Network' }
+		});
 	}
 
 	function handleCreateDaemon() {

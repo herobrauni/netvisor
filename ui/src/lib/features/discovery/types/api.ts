@@ -1,5 +1,13 @@
+export type DiscoveryType =
+	| { type: 'SelfReport' }
+	| { type: 'Network' }
+	| { type: 'Ping' }
+	| { type: 'Docker'; host_id: string }
+	| { type: 'Proxmox'; host_id: string };
+
 export interface InitiateDiscoveryRequest {
 	daemon_id: string;
+	discovery_type: DiscoveryType;
 }
 
 export interface DiscoverySessionRequest {

@@ -53,7 +53,7 @@ impl Default for DiscoveryMetadata {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash, Display, Copy)]
-#[serde(tag = "discovery_type")]
+#[serde(tag = "type")]
 pub enum DiscoveryType {
     SelfReport,
     Network,
